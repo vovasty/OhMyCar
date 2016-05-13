@@ -17,6 +17,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LoadingScreenupper" translatesAutoresizingMaskIntoConstraints="NO" id="NSd-PM-xc3">
+                                <rect key="frame" x="0.0" y="20" width="600" height="289"/>
+                                <color key="backgroundColor" red="0.97534459829999998" green="0.96169930699999995" blue="0.92766487600000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="tintColor" red="0.90906804799999996" green="0.8877906203" blue="0.82401329280000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LoadingScreenLower" translatesAutoresizingMaskIntoConstraints="NO" id="PbS-R4-eXT">
+                                <rect key="frame" x="0.0" y="309" width="600" height="247"/>
+                                <color key="backgroundColor" red="0.90906804799999996" green="0.8877906203" blue="0.82401329280000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="tintColor" red="0.97534459829999998" green="0.96169930699999995" blue="0.92766487600000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="247" id="75V-NB-IFr"/>
+                                </constraints>
+                            </imageView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jb4-yE-r1U">
                                 <rect key="frame" x="0.0" y="556" width="600" height="44"/>
                                 <items/>
@@ -24,9 +37,16 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="NSd-PM-xc3" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="1dK-HT-QNB"/>
+                            <constraint firstItem="PbS-R4-eXT" firstAttribute="trailing" secondItem="jb4-yE-r1U" secondAttribute="trailing" id="99Q-bP-703"/>
                             <constraint firstItem="jb4-yE-r1U" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="AvT-kk-eet"/>
+                            <constraint firstItem="PbS-R4-eXT" firstAttribute="top" secondItem="NSd-PM-xc3" secondAttribute="bottom" id="CQa-gU-nNr"/>
+                            <constraint firstItem="PbS-R4-eXT" firstAttribute="leading" secondItem="jb4-yE-r1U" secondAttribute="leading" id="Y2H-b8-hOQ"/>
                             <constraint firstAttribute="trailing" secondItem="jb4-yE-r1U" secondAttribute="trailing" id="cf1-JX-mRJ"/>
+                            <constraint firstAttribute="bottom" secondItem="PbS-R4-eXT" secondAttribute="bottom" constant="44" id="e2F-7s-fxw"/>
                             <constraint firstItem="xb3-aO-Qok" firstAttribute="top" secondItem="jb4-yE-r1U" secondAttribute="bottom" id="eiu-ev-1WO"/>
+                            <constraint firstItem="NSd-PM-xc3" firstAttribute="top" secondItem="Llm-lL-Icb" secondAttribute="bottom" id="jcP-Nf-tWM"/>
+                            <constraint firstAttribute="trailing" secondItem="NSd-PM-xc3" secondAttribute="trailing" id="mK7-o6-0d4"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -35,4 +55,8 @@
             <point key="canvasLocation" x="53" y="375"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="LoadingScreenLower" width="101" height="138"/>
+        <image name="LoadingScreenupper" width="101" height="90"/>
+    </resources>
 </document>
