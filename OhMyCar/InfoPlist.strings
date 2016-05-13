@@ -1,0 +1,9 @@
+/* 
+  InfoPlist.strings
+  Ohmycar
+
+  Created by Solomenchuk, Vlad on 5/12/16.
+  Copyright © 2016 Aramzamzam LLC. All rights reserved.
+*/
+
+"CFBundleDisplayName" = "Oh My Car";
