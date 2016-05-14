@@ -316,29 +316,20 @@ class CameraViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
     // Also note that it is not always possible to resume, see -[resumeInterruptedSession:].
 //    BOOL showResumeButton = NO;
     
-    let userInfo = notification.userInfo!
-    // In iOS 9 and later, the userInfo dictionary contains information on why the session was interrupted.
-        if #available(iOS 9.0, *)
-        {
-            if let reason = userInfo[AVCaptureSessionInterruptionReasonKey] as? Int, let interruptionReason = AVCaptureSessionInterruptionReason(rawValue: reason) {
-                print("Capture session was interrupted with reason \(reason)")
-                switch interruptionReason {
-                    case .AudioDeviceInUseByAnotherClient, .VideoDeviceInUseByAnotherClient:
-                        //showResumeButton = YES;
-                    break
-                case .VideoDeviceNotAvailableWithMultipleForegroundApps:
-                    //    self.cameraUnavailableLabel.hidden = NO;
-                    break
-                default:
-                    //showResumeButton = ( [UIApplication sharedApplication].applicationState == UIApplicationStateInactive );
-                    break
-                }
+        let userInfo = notification.userInfo!
+        if let reason = userInfo[AVCaptureSessionInterruptionReasonKey] as? Int, let interruptionReason = AVCaptureSessionInterruptionReason(rawValue: reason) {
+            print("Capture session was interrupted with reason \(reason)")
+            switch interruptionReason {
+                case .AudioDeviceInUseByAnotherClient, .VideoDeviceInUseByAnotherClient:
+                    //showResumeButton = YES;
+                break
+            case .VideoDeviceNotAvailableWithMultipleForegroundApps:
+                //    self.cameraUnavailableLabel.hidden = NO;
+                break
+            default:
+                //showResumeButton = ( [UIApplication sharedApplication].applicationState == UIApplicationStateInactive );
+                break
             }
-        }
-        else
-        {
-            //showResumeButton = ( [UIApplication sharedApplication].applicationState == UIApplicationStateInactive );
-            print("Capture session was interrupted")
         }
     }
     

@@ -11,19 +11,34 @@ import MapKit
 
 class MapViewController: UIViewController{
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var markLocationButton: UIBarButtonItem!
+    @IBOutlet weak var navigateButton: UIBarButtonItem!
+    @IBOutlet weak var captureViewControllerTop: NSLayoutConstraint!
+    @IBOutlet weak var historyButton: UIButton!
     private var annotation = MKPointAnnotation()
     private let geocoder = CLGeocoder()
     private var needUpdateTrackingMode = false
     private var captureViewController: CaptureViewController!
+    private var notificationObservers = [NSObjectProtocol]()
     
     var location: Location? {
         didSet {
-            guard let location = location else { return }
+            guard let location = location else {
+                mapView.removeAnnotation(annotation)
+                markLocationButton.image = UIImage(named: "PinToolbarUnfilled")
+                captureViewController.clear()
+                navigateButton.enabled = false
+                return
+            }
+            
+            markLocationButton.image = UIImage(named: "PinToolbarFilled")
             mapView.setCenterCoordinate(location.coordinate, animated: true)
             annotation.coordinate = location.coordinate
             mapView.removeAnnotation(annotation)
             mapView.showAnnotations([annotation], animated: true)
+            navigateButton.enabled = true
             captureViewController.image = location.image
+            captureViewController.editable = location.editable
         }
     }
     
@@ -31,6 +46,7 @@ class MapViewController: UIViewController{
         super.viewDidLoad()
         
         location = Database.instance.locations.first
+        self.prefersStatusBarHidden()
         
         if let location = location {
             annotation.title = "My Car"
@@ -47,6 +63,19 @@ class MapViewController: UIViewController{
             self.mapView.showsUserLocation = true
             self.mapView.userTrackingMode = MKUserTrackingMode.FollowWithHeading
         }
+        
+        //set location ono-editable when entering background.
+        notificationObservers.append(
+            NSNotificationCenter.defaultCenter().addObserverForName(UIApplicationDidEnterBackgroundNotification, object: nil, queue: nil) { (_) in
+                let loc = self.location
+                loc?.editable = false
+                self.location = loc
+            }
+        )
+    }
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return true
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -58,33 +87,31 @@ class MapViewController: UIViewController{
             break
         }
     }
+    @objc
+    @IBAction
+    private func unwindToMap(segue:UIStoryboardSegue) {
+    }
     
     @objc
-    @IBAction private func markLocation(sender: AnyObject) {
-        let location: Location
-        if var loc: Location? = self.location ?? Database.instance.locations.first {
-            if !(loc?.editable ?? false) {
-                loc = Database.instance.locations.first
-            }
+    @IBAction
+    private func markLocation(sender: AnyObject) {
+        guard self.location == nil else {
+            self.location = nil
             
-            if loc == nil {
-                loc = Database.instance.recordLocation(mapView.centerCoordinate, address: nil)
-                captureViewController.image = nil
-            }
+            let animation = CABasicAnimation(keyPath: "transform.rotation.z")
+            animation.toValue = CGFloat(M_PI) * 2 * -1
+            animation.duration = 0.25
+            animation.cumulative = true
+            animation.repeatCount = 1
+            historyButton.layer.addAnimation(animation, forKey:"transform.rotation.z")
             
-            location = loc!
-            location.coordinate = mapView.centerCoordinate
-            location.address = nil
-            location.editable = true
-        }
-        else {
-            location = Database.instance.recordLocation(mapView.centerCoordinate, address: nil)
-            location.editable = true
-            captureViewController.image = nil
+            return
         }
         
-        Database.instance.save()
+        let location = Database.instance.recordLocation(mapView.centerCoordinate, address: nil)
+        location.editable = true
         self.location = location
+        Database.instance.save()
         
         if captureViewController.image == nil {
             captureViewController.capture()
@@ -115,17 +142,9 @@ class MapViewController: UIViewController{
     
     @objc
     @IBAction
-    private func showCurrentLocation(sender: AnyObject) {
+    private func showUserCurrentLocation(sender: AnyObject) {
         needUpdateTrackingMode = true
         mapView.setCenterCoordinate(mapView.userLocation.coordinate, animated: true)
-    }
-    
-    @objc
-    @IBAction
-    private func showHistoryLocation(segue: UIStoryboardSegue) {
-        if let historyViewController = segue.sourceViewController as? HistoryViewController {
-            self.location = historyViewController.location
-        }
     }
     
     private func updateAddress() {
@@ -140,6 +159,13 @@ class MapViewController: UIViewController{
             location.address = address
             self.annotation.subtitle = location.formattedAddress
             Database.instance.save()
+        }
+    }
+    
+    deinit {
+        let nc = NSNotificationCenter.defaultCenter()
+        for observer in notificationObservers {
+            nc.removeObserver(observer)
         }
     }
 }
@@ -188,5 +214,6 @@ extension MapViewController: MKMapViewDelegate {
 extension MapViewController: CaptureViewControllerDelegate {
     func captureViewController(controller: CameraViewController, didCaptureImage image: UIImage?) {
         location?.image = image
+        Database.instance.save()
     }
 }

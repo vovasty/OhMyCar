@@ -16,6 +16,8 @@ class CaptureViewController: CameraViewController {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var captureButton: UIButton!
     @IBOutlet weak var curtainView: UIView!
+    @IBOutlet weak var discardButton: UIButton!
+    
     weak var delegate: CaptureViewControllerDelegate?
     
     override var setupResult: CamSetupResult {
@@ -41,21 +43,32 @@ class CaptureViewController: CameraViewController {
         super.viewDidLoad()
         imageView.opaque = true
         imageView.layer.masksToBounds = true
-        imageView.contentMode = .ScaleAspectFill
         imageView.hidden = true
         captureButton.hidden = true
         curtainView.alpha = 0
     }
     
     var image: UIImage? {
-        set {
-            imageView.image = newValue
+        didSet {
+            
+            if image == nil {
+                imageView.contentMode = .Center
+                imageView.image = UIImage(named: "LoadingScreenupper")
+            }
+            else {
+                imageView.contentMode = .ScaleAspectFill
+                imageView.image = image
+            }
+            
             imageView.hidden = false
             view.bringSubviewToFront(imageView)
+            
         }
-        
-        get {
-            return imageView.image
+    }
+    
+    var editable: Bool = true {
+        didSet {
+            discardButton.hidden = !editable
         }
     }
     
@@ -71,7 +84,7 @@ class CaptureViewController: CameraViewController {
                 return
             }
             
-            self.imageView.image = image
+            self.image = image
             self.imageView.hidden = false
             
             dispatch_async(dispatch_get_main_queue()) {
@@ -89,6 +102,14 @@ class CaptureViewController: CameraViewController {
         
         transition { () in
             self.captureButton.hidden = false
+            self.imageView.image = nil
+        }
+    }
+    
+    func clear() {
+        transition { () in
+            self.view.sendSubviewToBack(self.imageView)
+            self.captureButton.hidden = true
             self.imageView.image = nil
         }
     }
