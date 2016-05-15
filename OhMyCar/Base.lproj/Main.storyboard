@@ -96,9 +96,9 @@
                             <constraint firstItem="Ryt-ra-7EU" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="XYI-Oa-NOa"/>
                             <constraint firstAttribute="trailing" secondItem="uAb-nK-sgW" secondAttribute="trailing" id="aM2-YN-HBy"/>
                             <constraint firstItem="bHY-4u-r9W" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="biQ-vj-ibV"/>
-                            <constraint firstItem="Ryt-ra-7EU" firstAttribute="top" secondItem="bHY-4u-r9W" secondAttribute="bottom" id="d3R-br-06b"/>
                             <constraint firstItem="uAb-nK-sgW" firstAttribute="top" secondItem="2R4-N5-Ef7" secondAttribute="bottom" id="dSR-R3-DLh"/>
                             <constraint firstAttribute="trailing" secondItem="2R4-N5-Ef7" secondAttribute="trailing" id="moy-GV-zST"/>
+                            <constraint firstItem="Ryt-ra-7EU" firstAttribute="top" secondItem="bHY-4u-r9W" secondAttribute="bottom" id="qfS-rn-XtY"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Ryt-ra-7EU" secondAttribute="bottom" id="t1a-TH-gr2"/>
                             <constraint firstAttribute="trailing" secondItem="Ryt-ra-7EU" secondAttribute="trailing" id="tuI-D5-orW"/>
                             <constraint firstItem="bHY-4u-r9W" firstAttribute="height" secondItem="Ryt-ra-7EU" secondAttribute="height" id="wzg-u0-lrS"/>
@@ -113,7 +113,6 @@
                         <outlet property="navigateButton" destination="sFW-8y-M09" id="aPJ-UW-ZpO"/>
                         <outlet property="undoLabel" destination="j94-ED-dvN" id="zem-DC-IyS"/>
                         <outlet property="undoView" destination="bHY-4u-r9W" id="jeZ-82-BWD"/>
-                        <outlet property="undoViewBottom" destination="d3R-br-06b" id="bFS-ds-IPG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

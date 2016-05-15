@@ -13,7 +13,6 @@ class MapViewController: UIViewController{
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var markLocationButton: UIBarButtonItem!
     @IBOutlet weak var navigateButton: UIBarButtonItem!
-    @IBOutlet weak var undoViewBottom: NSLayoutConstraint!
     @IBOutlet weak var undoView: UIView!
     @IBOutlet weak var undoLabel: UILabel!
     private var undoAction: (()->Void)?
@@ -56,7 +55,7 @@ class MapViewController: UIViewController{
             mapView.addAnnotation(annotation)
         }
         
-        hideUndo()
+        hideUndo(false)
         
         LocationManager.userLocation { (location)->Void in
             guard let location = location else { return }
@@ -107,10 +106,9 @@ class MapViewController: UIViewController{
             Database.instance.current = nil
             Database.instance.save()
             
-            let lastCenter = mapView.centerCoordinate
             showUndo("Location discarded") {
                 self.location = Database.instance.restoreBackup()
-                self.mapView.centerCoordinate = lastCenter
+                self.mapView.centerCoordinate = self.location!.coordinate
             }
             
             mapView.centerCoordinate = mapView.userLocation.coordinate
@@ -166,15 +164,19 @@ class MapViewController: UIViewController{
     }
     
     @objc
-    private func hideUndo() {
+    private func hideUndo(animated: Bool = true) {
         NSObject.cancelPreviousPerformRequestsWithTarget(self, selector: #selector(hideUndo), object: nil)
         
-        undoViewBottom.constant = -undoView.frame.size.height
-
-        UIView.animateWithDuration(0.25, animations: {
-            self.view.layoutIfNeeded()
+        if animated {
+            UIView.animateWithDuration(0.25, animations: {
+                self.undoView.alpha = 0
             }) { (_) in
                 self.undoView.hidden = true
+            }
+        }
+        else {
+            undoView.alpha = 0
+            undoView.hidden = true
         }
     }
     
@@ -182,10 +184,9 @@ class MapViewController: UIViewController{
         undoAction = action
         undoLabel.text = message
         
-        undoViewBottom.constant = 0
         undoView.hidden = false
         UIView.animateWithDuration(0.25) {
-            self.view.layoutIfNeeded()
+            self.undoView.alpha = 1
         }
         
         performSelector(#selector(hideUndo), withObject: nil, afterDelay: 2)
