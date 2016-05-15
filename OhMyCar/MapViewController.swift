@@ -13,8 +13,10 @@ class MapViewController: UIViewController{
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var markLocationButton: UIBarButtonItem!
     @IBOutlet weak var navigateButton: UIBarButtonItem!
-    @IBOutlet weak var captureViewControllerTop: NSLayoutConstraint!
-    @IBOutlet weak var historyButton: UIButton!
+    @IBOutlet weak var undoViewBottom: NSLayoutConstraint!
+    @IBOutlet weak var undoView: UIView!
+    @IBOutlet weak var undoLabel: UILabel!
+    private var undoAction: (()->Void)?
     private var annotation = MKPointAnnotation()
     private let geocoder = CLGeocoder()
     private var needUpdateTrackingMode = false
@@ -45,7 +47,7 @@ class MapViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        location = Database.instance.locations.first
+        location = Database.instance.current
         self.prefersStatusBarHidden()
         
         if let location = location {
@@ -53,6 +55,8 @@ class MapViewController: UIViewController{
             annotation.coordinate = location.coordinate
             mapView.addAnnotation(annotation)
         }
+        
+        hideUndo()
         
         LocationManager.userLocation { (location)->Void in
             guard let location = location else { return }
@@ -87,9 +91,12 @@ class MapViewController: UIViewController{
             break
         }
     }
+    
     @objc
     @IBAction
-    private func unwindToMap(segue:UIStoryboardSegue) {
+    func undo(sender: AnyObject) {
+        undoAction?()
+        hideUndo()
     }
     
     @objc
@@ -97,18 +104,22 @@ class MapViewController: UIViewController{
     private func markLocation(sender: AnyObject) {
         guard self.location == nil else {
             self.location = nil
+            Database.instance.current = nil
+            Database.instance.save()
             
-            let animation = CABasicAnimation(keyPath: "transform.rotation.z")
-            animation.toValue = CGFloat(M_PI) * 2 * -1
-            animation.duration = 0.25
-            animation.cumulative = true
-            animation.repeatCount = 1
-            historyButton.layer.addAnimation(animation, forKey:"transform.rotation.z")
+            let lastCenter = mapView.centerCoordinate
+            showUndo("Location discarded") {
+                self.location = Database.instance.restoreBackup()
+                self.mapView.centerCoordinate = lastCenter
+            }
             
+            mapView.centerCoordinate = mapView.userLocation.coordinate
             return
         }
         
-        let location = Database.instance.recordLocation(mapView.centerCoordinate, address: nil)
+        let coordinate = mapView.userLocation.coordinate
+        mapView.centerCoordinate = coordinate
+        let location = Database.instance.recordLocation(coordinate, address: nil)
         location.editable = true
         self.location = location
         Database.instance.save()
@@ -144,7 +155,40 @@ class MapViewController: UIViewController{
     @IBAction
     private func showUserCurrentLocation(sender: AnyObject) {
         needUpdateTrackingMode = true
-        mapView.setCenterCoordinate(mapView.userLocation.coordinate, animated: true)
+        
+        let start = CLLocation(latitude: mapView.userLocation.coordinate.latitude, longitude: mapView.userLocation.coordinate.longitude)
+        let end = CLLocation(latitude: mapView.centerCoordinate.latitude, longitude: mapView.centerCoordinate.longitude)
+        
+        let distance = start.distanceFromLocation(end)
+
+        
+        mapView.setCenterCoordinate(mapView.userLocation.coordinate, animated: distance < 1000)
+    }
+    
+    @objc
+    private func hideUndo() {
+        NSObject.cancelPreviousPerformRequestsWithTarget(self, selector: #selector(hideUndo), object: nil)
+        
+        undoViewBottom.constant = -undoView.frame.size.height
+
+        UIView.animateWithDuration(0.25, animations: {
+            self.view.layoutIfNeeded()
+            }) { (_) in
+                self.undoView.hidden = true
+        }
+    }
+    
+    private func showUndo(message: String, action: ()->Void) {
+        undoAction = action
+        undoLabel.text = message
+        
+        undoViewBottom.constant = 0
+        undoView.hidden = false
+        UIView.animateWithDuration(0.25) {
+            self.view.layoutIfNeeded()
+        }
+        
+        performSelector(#selector(hideUndo), withObject: nil, afterDelay: 2)
     }
     
     private func updateAddress() {

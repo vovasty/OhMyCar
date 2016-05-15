@@ -26,6 +26,7 @@ class Location: NSObject, NSCoding {
                 if let imagePath = imagePath {
                     do {
                         try NSFileManager.defaultManager().removeItemAtURL(imagePath)
+                        print("removed image \(imagePath)")
                     }
                     catch {
                         print("unable to remove image \(error)")
@@ -92,7 +93,7 @@ class Location: NSObject, NSCoding {
 }
 
 class Database {
-    private (set) var locations: [Location] = []
+    private var locations: [String: Location] = [:]
     let savePath: NSURL
     let basePath: NSURL
     
@@ -104,10 +105,47 @@ class Database {
 
     }
     
+    var current: Location? {
+        get {
+            return locations["current"]
+        }
+        
+        set {
+            setLocation("backup", location: current, clear: true)
+            setLocation("current", location: newValue, clear: false)
+        }
+    }
+    
+    private var backup: Location? {
+        get {
+            return locations["backup"]
+        }
+    }
+
+    
+    private func setLocation(key: String, location: Location?, clear: Bool) {
+        if clear {
+            locations[key]?.image = nil
+        }
+        
+        guard let location = location else {
+            locations.removeValueForKey(key)
+            return
+        }
+        
+        locations[key] = location
+    }
+
     func recordLocation(coordinate: CLLocationCoordinate2D, address: [String: AnyObject]?) -> Location {
-        let location = Location(coordinate: coordinate, address: address, basePath: basePath)
-        locations.insert(location, atIndex: 0)
-        return location
+        current = Location(coordinate: coordinate, address: address, basePath: basePath)
+        
+        return current!
+    }
+    
+    func restoreBackup() -> Location? {
+        setLocation("current", location: backup, clear: true)
+        setLocation("backup", location: nil, clear: false)
+        return current
     }
     
     func save() {
@@ -115,9 +153,9 @@ class Database {
     }
     
     func load() {
-        guard let locations = NSKeyedUnarchiver.unarchiveObjectWithFile(savePath.path!) as? [Location] else { return }
+        guard let locations = NSKeyedUnarchiver.unarchiveObjectWithFile(savePath.path!) as? [String: Location] else { return }
         self.locations = locations
-        for location in locations {
+        for location in locations.values {
             location.basePath = basePath
         }
     }

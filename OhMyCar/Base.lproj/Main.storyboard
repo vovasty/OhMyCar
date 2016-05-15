@@ -32,6 +32,37 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="fdQ-TG-sO2"/>
                                 </connections>
                             </mapView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bHY-4u-r9W" userLabel="UndoView">
+                                <rect key="frame" x="0.0" y="512" width="600" height="44"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AcC-Uh-IKy">
+                                        <rect key="frame" x="548" y="7" width="44" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="44" id="fcF-Y8-Gag"/>
+                                        </constraints>
+                                        <state key="normal" title="UNDO">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="undo:" destination="BYZ-38-t0r" eventType="touchUpInside" id="lpO-aC-RkL"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="j94-ED-dvN">
+                                        <rect key="frame" x="8" y="11" width="532" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" name="selectedMenuItemColor" catalog="System" colorSpace="catalog"/>
+                                <constraints>
+                                    <constraint firstItem="j94-ED-dvN" firstAttribute="centerY" secondItem="bHY-4u-r9W" secondAttribute="centerY" id="2Qy-4q-JWW"/>
+                                    <constraint firstItem="AcC-Uh-IKy" firstAttribute="leading" secondItem="j94-ED-dvN" secondAttribute="trailing" constant="8" id="byo-nl-4Rx"/>
+                                    <constraint firstItem="AcC-Uh-IKy" firstAttribute="centerY" secondItem="bHY-4u-r9W" secondAttribute="centerY" id="jVS-R0-v1m"/>
+                                    <constraint firstAttribute="trailing" secondItem="AcC-Uh-IKy" secondAttribute="trailing" constant="8" id="utO-TC-ac4"/>
+                                    <constraint firstItem="j94-ED-dvN" firstAttribute="leading" secondItem="bHY-4u-r9W" secondAttribute="leading" constant="8" id="zq8-AQ-I1x"/>
+                                </constraints>
+                            </view>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ryt-ra-7EU">
                                 <rect key="frame" x="0.0" y="556" width="600" height="44"/>
                                 <items>
@@ -54,18 +85,6 @@
                                     </barButtonItem>
                                 </items>
                             </toolbar>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4A6-Hj-CKY">
-                                <rect key="frame" x="548" y="28" width="44" height="44"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="44" id="O2x-kz-GeO"/>
-                                    <constraint firstAttribute="height" constant="44" id="gzW-HB-P9L"/>
-                                </constraints>
-                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <state key="normal" image="History"/>
-                                <connections>
-                                    <segue destination="YUl-i8-omk" kind="presentation" id="nAU-RM-mY2"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -73,78 +92,33 @@
                             <constraint firstItem="2R4-N5-Ef7" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="NXo-SG-w8Q"/>
                             <constraint firstItem="Ryt-ra-7EU" firstAttribute="top" secondItem="uAb-nK-sgW" secondAttribute="bottom" id="OaX-bb-jdc"/>
                             <constraint firstItem="2R4-N5-Ef7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="TGe-Mq-136"/>
+                            <constraint firstAttribute="trailing" secondItem="bHY-4u-r9W" secondAttribute="trailing" id="U5r-fN-lFf"/>
                             <constraint firstItem="Ryt-ra-7EU" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="XYI-Oa-NOa"/>
                             <constraint firstAttribute="trailing" secondItem="uAb-nK-sgW" secondAttribute="trailing" id="aM2-YN-HBy"/>
+                            <constraint firstItem="bHY-4u-r9W" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="biQ-vj-ibV"/>
+                            <constraint firstItem="Ryt-ra-7EU" firstAttribute="top" secondItem="bHY-4u-r9W" secondAttribute="bottom" id="d3R-br-06b"/>
                             <constraint firstItem="uAb-nK-sgW" firstAttribute="top" secondItem="2R4-N5-Ef7" secondAttribute="bottom" id="dSR-R3-DLh"/>
-                            <constraint firstAttribute="trailing" secondItem="4A6-Hj-CKY" secondAttribute="trailing" constant="8" id="g0K-sH-FaJ"/>
                             <constraint firstAttribute="trailing" secondItem="2R4-N5-Ef7" secondAttribute="trailing" id="moy-GV-zST"/>
-                            <constraint firstItem="4A6-Hj-CKY" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" id="sZY-ID-l3L"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Ryt-ra-7EU" secondAttribute="bottom" id="t1a-TH-gr2"/>
                             <constraint firstAttribute="trailing" secondItem="Ryt-ra-7EU" secondAttribute="trailing" id="tuI-D5-orW"/>
+                            <constraint firstItem="bHY-4u-r9W" firstAttribute="height" secondItem="Ryt-ra-7EU" secondAttribute="height" id="wzg-u0-lrS"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Bcl-u3-Ar2">
                         <barButtonItem key="leftBarButtonItem" title="History" id="dge-OS-ZXe"/>
                     </navigationItem>
                     <connections>
-                        <outlet property="captureViewControllerTop" destination="NXo-SG-w8Q" id="ik3-Vn-7ZZ"/>
-                        <outlet property="historyButton" destination="4A6-Hj-CKY" id="g0e-xk-PKl"/>
                         <outlet property="mapView" destination="uAb-nK-sgW" id="q5v-bU-8VS"/>
                         <outlet property="markLocationButton" destination="2aN-rX-vrf" id="7Zf-bJ-Ti3"/>
                         <outlet property="navigateButton" destination="sFW-8y-M09" id="aPJ-UW-ZpO"/>
+                        <outlet property="undoLabel" destination="j94-ED-dvN" id="zem-DC-IyS"/>
+                        <outlet property="undoView" destination="bHY-4u-r9W" id="jeZ-82-BWD"/>
+                        <outlet property="undoViewBottom" destination="d3R-br-06b" id="bFS-ds-IPG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="956" y="200"/>
-        </scene>
-        <!--History View Controller-->
-        <scene sceneID="Nik-QZ-2td">
-            <objects>
-                <tableViewController id="iVa-Kj-yQj" customClass="HistoryViewController" customModule="OhMyCar" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="JQf-zY-l4E">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="HistoryCell" textLabel="oFn-vx-hkM" style="IBUITableViewCellStyleDefault" id="73F-MD-tPg">
-                                <rect key="frame" x="0.0" y="92" width="600" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="73F-MD-tPg" id="1sP-pM-fV2">
-                                    <rect key="frame" x="0.0" y="0.0" width="600" height="43.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="oFn-vx-hkM">
-                                            <rect key="frame" x="15" y="0.0" width="570" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                </tableViewCellContentView>
-                                <connections>
-                                    <segue destination="deW-Yt-clo" kind="unwind" unwindAction="showHistoryLocation:" id="f1p-jL-CAI"/>
-                                </connections>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="iVa-Kj-yQj" id="KIw-26-nQ1"/>
-                            <outlet property="delegate" destination="iVa-Kj-yQj" id="9vQ-3O-aC8"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" id="Wii-Lc-Kq1">
-                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="lpN-my-nk0">
-                            <connections>
-                                <segue destination="deW-Yt-clo" kind="unwind" unwindAction="unwindToMap:" id="Xio-Kr-ETr"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="fP9-Hb-wbm" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="deW-Yt-clo" userLabel="Exit" sceneMemberID="exit"/>
-            </objects>
-            <point key="canvasLocation" x="2296" y="250"/>
         </scene>
         <!--Capture View Controller-->
         <scene sceneID="NDs-Lb-xuf">
@@ -163,7 +137,7 @@
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SrF-3d-jhb">
-                                <rect key="frame" x="260" y="162" width="80" height="80"/>
+                                <rect key="frame" x="272" y="186" width="56" height="56"/>
                                 <state key="normal" image="Capture"/>
                                 <connections>
                                     <action selector="capture:" destination="0PL-l1-Sp5" eventType="touchUpInside" id="0eo-H4-MIJ"/>
@@ -219,28 +193,11 @@
             </objects>
             <point key="canvasLocation" x="1007" y="-506"/>
         </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="GyL-Lk-dPr">
-            <objects>
-                <navigationController id="YUl-i8-omk" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="wPG-wH-Kcd">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="iVa-Kj-yQj" kind="relationship" relationship="rootViewController" id="e7U-0a-f0r"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="L6k-M5-zRT" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1629" y="250"/>
-        </scene>
     </scenes>
     <resources>
         <image name="Button" width="15" height="15"/>
-        <image name="Capture" width="80" height="80"/>
+        <image name="Capture" width="56" height="56"/>
         <image name="Car" width="33" height="22"/>
-        <image name="History" width="22" height="22"/>
         <image name="Location" width="22" height="22"/>
         <image name="PinToolbarUnfilled" width="40" height="40"/>
     </resources>

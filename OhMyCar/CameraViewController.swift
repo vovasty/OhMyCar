@@ -179,6 +179,11 @@ class CameraViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
     //MARK: Actions
     
     func snapStillImage(closure: (UIImage?, NSError?)->Void) {
+        guard setupResult == .Success else {
+            closure(nil, nil)
+            return
+        }
+        
         dispatch_async(queue) {
             let connection = self.stillImageOutput!.connectionWithMediaType(AVMediaTypeVideo)
             let previewLayer = self.previewView.layer as! AVCaptureVideoPreviewLayer
