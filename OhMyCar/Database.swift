@@ -109,7 +109,7 @@ class Database {
     let savePath: NSURL
     let basePath: NSURL
     
-    static var instance : Database = Database(savePath: NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!.URLByAppendingPathComponent("locations.plist"))
+    static var instance : Database = Database(savePath: NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!.URLByAppendingPathComponent("location.plist"))
     
     init(savePath: NSURL) {
         self.savePath = savePath

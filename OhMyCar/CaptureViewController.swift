@@ -113,7 +113,7 @@ class CaptureViewController: CameraViewController {
         delegate?.captureViewController(self, didDiscardImage: self.imageView.image)
         
         transition { () in
-            self.captureButton.hidden = false
+            self.captureButton.hidden = self.setupResult != .Success
             self.imageView.image = nil
             self.imageView.hidden = true
         }
