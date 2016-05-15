@@ -72,10 +72,17 @@
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="0Eo-xh-aAR"/>
-                                    <barButtonItem image="PinToolbarUnfilled" id="2aN-rX-vrf">
-                                        <connections>
-                                            <action selector="markLocation:" destination="BYZ-38-t0r" id="j8c-zL-MKm"/>
-                                        </connections>
+                                    <barButtonItem style="plain" id="y7z-EQ-Zsk">
+                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="8rw-aX-7cM">
+                                            <rect key="frame" x="261" y="7" width="78" height="30"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                                            <state key="normal" title="Mark Spot"/>
+                                            <state key="selected" title="Discard"/>
+                                            <connections>
+                                                <action selector="markLocation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="G6U-ZO-wzE"/>
+                                            </connections>
+                                        </button>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="3qt-vI-8vU"/>
                                     <barButtonItem image="Car" id="sFW-8y-M09">
@@ -109,7 +116,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="mapView" destination="uAb-nK-sgW" id="q5v-bU-8VS"/>
-                        <outlet property="markLocationButton" destination="2aN-rX-vrf" id="7Zf-bJ-Ti3"/>
+                        <outlet property="markLocationButton" destination="8rw-aX-7cM" id="1a5-Ff-Lag"/>
                         <outlet property="navigateButton" destination="sFW-8y-M09" id="aPJ-UW-ZpO"/>
                         <outlet property="undoLabel" destination="j94-ED-dvN" id="zem-DC-IyS"/>
                         <outlet property="undoView" destination="bHY-4u-r9W" id="jeZ-82-BWD"/>
@@ -253,6 +260,5 @@
         <image name="Car" width="33" height="22"/>
         <image name="LoadingScreenupper" width="101" height="90"/>
         <image name="Location" width="22" height="22"/>
-        <image name="PinToolbarUnfilled" width="40" height="40"/>
     </resources>
 </document>

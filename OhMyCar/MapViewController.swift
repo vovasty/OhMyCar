@@ -11,7 +11,7 @@ import MapKit
 
 class MapViewController: UIViewController{
     @IBOutlet weak var mapView: MKMapView!
-    @IBOutlet weak var markLocationButton: UIBarButtonItem!
+    @IBOutlet weak var markLocationButton: UIButton!
     @IBOutlet weak var navigateButton: UIBarButtonItem!
     @IBOutlet weak var undoView: UIView!
     @IBOutlet weak var undoLabel: UILabel!
@@ -26,13 +26,13 @@ class MapViewController: UIViewController{
         didSet {
             guard let location = location else {
                 mapView.removeAnnotation(annotation)
-                markLocationButton.image = UIImage(named: "PinToolbarUnfilled")
+                markLocationButton.selected = false
                 captureViewController.clear()
                 navigateButton.enabled = false
                 return
             }
             
-            markLocationButton.image = UIImage(named: "PinToolbarFilled")
+            markLocationButton.selected = true
             mapView.setCenterCoordinate(location.coordinate, animated: true)
             annotation.coordinate = location.coordinate
             mapView.removeAnnotation(annotation)
@@ -106,9 +106,11 @@ class MapViewController: UIViewController{
         guard self.location == nil else {
             let savedLocation = self.location
             self.location = nil
+            
             Database.instance.location = nil
             Database.instance.save()
-            showUndo("Location discarded") {
+            
+            showUndo("Spot discarded") {
                 self.location = savedLocation
                 Database.instance.location = savedLocation
                 Database.instance.save()
