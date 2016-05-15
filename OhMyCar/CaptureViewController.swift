@@ -10,6 +10,7 @@ import UIKit
 
 protocol CaptureViewControllerDelegate: class {
     func captureViewController(controller: CameraViewController, didCaptureImage image: UIImage?)
+    func captureViewController(controller: CameraViewController, didDiscardImage image: UIImage?)
 }
 
 class CaptureViewController: CameraViewController {
@@ -98,7 +99,7 @@ class CaptureViewController: CameraViewController {
         self.view.sendSubviewToBack(imageView)
         view.bringSubviewToFront(captureButton)
         self.captureButton.hidden = true
-        delegate?.captureViewController(self, didCaptureImage: nil)
+        delegate?.captureViewController(self, didDiscardImage: self.imageView.image)
         
         transition { () in
             self.captureButton.hidden = false

@@ -185,6 +185,7 @@ class MapViewController: UIViewController{
         undoLabel.text = message
         
         undoView.hidden = false
+        undoView.alpha = 0
         UIView.animateWithDuration(0.25) {
             self.undoView.alpha = 1
         }
@@ -259,6 +260,18 @@ extension MapViewController: MKMapViewDelegate {
 extension MapViewController: CaptureViewControllerDelegate {
     func captureViewController(controller: CameraViewController, didCaptureImage image: UIImage?) {
         location?.image = image
+        Database.instance.save()
+    }
+    func captureViewController(controller: CameraViewController, didDiscardImage image: UIImage?) {
+        if let oldImage = image {
+            showUndo("Image discarded") {
+                self.location?.image = oldImage
+                self.captureViewController.image = oldImage
+                Database.instance.save()
+            }
+        }
+        
+        location?.image = nil
         Database.instance.save()
     }
 }
