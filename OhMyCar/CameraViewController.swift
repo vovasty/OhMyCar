@@ -67,7 +67,7 @@ class CameraViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
         view.addGestureRecognizer(zoomGesture)
         
         // Setup the preview view.
-        view.addSubview(previewView)
+        view.insertSubview(previewView, atIndex: 0)
         previewView.translatesAutoresizingMaskIntoConstraints = false
         previewView.topAnchor.constraintEqualToAnchor(view.topAnchor).active = true
         previewView.bottomAnchor.constraintEqualToAnchor(view.bottomAnchor).active = true
@@ -205,7 +205,9 @@ class CameraViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
 				let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
                 let image = UIImage(data: imageData)
 
-                closure(image, nil)
+                dispatch_async(dispatch_get_main_queue()) {
+                    closure(image, nil)
+                }
             }
         }
     }

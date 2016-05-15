@@ -18,6 +18,9 @@ class CaptureViewController: CameraViewController {
     @IBOutlet weak var captureButton: UIButton!
     @IBOutlet weak var curtainView: UIView!
     @IBOutlet weak var discardButton: UIButton!
+    @IBOutlet weak var errorView: UIView!
+    @IBOutlet weak var errorLabel: UILabel!
+    @IBOutlet weak var openSettingsButton: UIButton!
     
     weak var delegate: CaptureViewControllerDelegate?
     
@@ -25,14 +28,19 @@ class CaptureViewController: CameraViewController {
         didSet {
             switch self.setupResult {
             case .Success:
+                self.errorView.hidden = true
                 break
             case .CameraNotAuthorized:
                 dispatch_async(dispatch_get_main_queue()) {
-                    //                    self.delegate?.cameraViewController(self, failedToStart: NSError(domain: "net.aramzamzam.CameraViewController", code: -1, userInfo: [NSLocalizedDescriptionKey: "Camera access is not authorized"]))
+                    self.errorView.hidden = false
+                    self.errorLabel.text = "Have no permission to use the camera"
+                    self.openSettingsButton.hidden = false
                 }
             case .SessionConfigurationFailed:
                 dispatch_async(dispatch_get_main_queue()) {
-                    //                    self.delegate?.cameraViewController(self, failedToStart: NSError(domain: "net.aramzamzam.CameraViewController", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to setup camera"]))
+                    self.errorView.hidden = false
+                    self.openSettingsButton?.hidden = true
+                    self.errorLabel.text = "Unable to use the camera"
                 }
                 break
             }
@@ -46,6 +54,8 @@ class CaptureViewController: CameraViewController {
         imageView.layer.masksToBounds = true
         imageView.hidden = true
         captureButton.hidden = true
+        self.image = nil
+        self.editable = false
         curtainView.alpha = 0
     }
     
@@ -62,8 +72,7 @@ class CaptureViewController: CameraViewController {
             }
             
             imageView.hidden = false
-            view.bringSubviewToFront(imageView)
-            
+            captureButton.hidden = true
         }
     }
     
@@ -75,41 +84,44 @@ class CaptureViewController: CameraViewController {
     
     func capture() {
         imageView.hidden = true
-        view.bringSubviewToFront(imageView)
         
         showCurtain()
         snapStillImage { (image, error) in
             guard let image = image where error == nil else {
-                self.view.sendSubviewToBack(self.imageView)
+                self.image = nil
+                self.editable = false
                 self.hideCurtain()
                 return
             }
             
             self.image = image
             self.imageView.hidden = false
+            self.captureButton.hidden = true
             
-            dispatch_async(dispatch_get_main_queue()) {
-                self.delegate?.captureViewController(self, didCaptureImage: image)
-            }
+            self.delegate?.captureViewController(self, didCaptureImage: image)
             self.hideCurtain()
         }
     }
     
+    @IBAction func openSettings(sender: AnyObject) {
+        UIApplication.sharedApplication().openURL(NSURL(string: UIApplicationOpenSettingsURLString)!)
+    }
+    
+    
     @IBAction func discard(sender: AnyObject) {
-        self.view.sendSubviewToBack(imageView)
-        view.bringSubviewToFront(captureButton)
         self.captureButton.hidden = true
         delegate?.captureViewController(self, didDiscardImage: self.imageView.image)
         
         transition { () in
             self.captureButton.hidden = false
             self.imageView.image = nil
+            self.imageView.hidden = true
         }
     }
     
     func clear() {
         transition { () in
-            self.view.sendSubviewToBack(self.imageView)
+            self.imageView.hidden = true
             self.captureButton.hidden = true
             self.imageView.image = nil
         }
@@ -120,8 +132,8 @@ class CaptureViewController: CameraViewController {
     }
     
     private func showCurtain(closure: (()->Void)? = nil) {
+        curtainView.hidden = false
         curtainView.alpha = 0
-        view.bringSubviewToFront(curtainView)
         
         UIView.animateWithDuration(0.25, animations: {
             self.curtainView.alpha = 1
@@ -131,9 +143,10 @@ class CaptureViewController: CameraViewController {
     }
     
     private func hideCurtain() {
-        view.bringSubviewToFront(curtainView)
         UIView.animateWithDuration(0.25, animations: {
             self.curtainView.alpha = 0
+            }, completion: { (_) in
+                self.curtainView.hidden = true
         })
     }
 
