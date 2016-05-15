@@ -19,6 +19,7 @@ class Location: NSObject, NSCoding {
         guard let imageName = imageName else { return nil }
         return basePath?.URLByAppendingPathComponent(imageName)
     }
+    private var clearResources = true
     
     var image: UIImage? {
         set {
@@ -90,10 +91,21 @@ class Location: NSObject, NSCoding {
         
         return addressArray.joinWithSeparator(" ")
     }
+    
+    deinit {
+        guard clearResources, let imagePath = imagePath else { return }
+        do {
+            try NSFileManager.defaultManager().removeItemAtURL(imagePath)
+            print("removed image \(imagePath)")
+        }
+        catch {
+            print("unable to remove image \(error)")
+        }
+    }
 }
 
 class Database {
-    private var locations: [String: Location] = [:]
+    var location: Location?
     let savePath: NSURL
     let basePath: NSURL
     
@@ -104,59 +116,34 @@ class Database {
         self.basePath = savePath.URLByDeletingLastPathComponent!
 
     }
-    
-    var current: Location? {
-        get {
-            return locations["current"]
-        }
-        
-        set {
-            setLocation("backup", location: current, clear: true)
-            setLocation("current", location: newValue, clear: false)
-        }
-    }
-    
-    private var backup: Location? {
-        get {
-            return locations["backup"]
-        }
-    }
-
-    
-    private func setLocation(key: String, location: Location?, clear: Bool) {
-        if clear {
-            locations[key]?.image = nil
-        }
-        
-        guard let location = location else {
-            locations.removeValueForKey(key)
-            return
-        }
-        
-        locations[key] = location
-    }
 
     func recordLocation(coordinate: CLLocationCoordinate2D, address: [String: AnyObject]?) -> Location {
-        current = Location(coordinate: coordinate, address: address, basePath: basePath)
+        location = Location(coordinate: coordinate, address: address, basePath: basePath)
         
-        return current!
-    }
-    
-    func restoreBackup() -> Location? {
-        setLocation("current", location: backup, clear: true)
-        setLocation("backup", location: nil, clear: false)
-        return current
+        return location!
     }
     
     func save() {
-        NSKeyedArchiver.archiveRootObject(locations, toFile: savePath.path!)
+        if let location = location {
+            NSKeyedArchiver.archiveRootObject(location, toFile: savePath.path!)
+        }
+        else {
+            do {
+                try NSFileManager.defaultManager().removeItemAtURL(savePath)
+            }
+            catch {
+                print("unable to remove locations \(error)")
+            }
+        }
     }
     
     func load() {
-        guard let locations = NSKeyedUnarchiver.unarchiveObjectWithFile(savePath.path!) as? [String: Location] else { return }
-        self.locations = locations
-        for location in locations.values {
-            location.basePath = basePath
-        }
+        guard let location = NSKeyedUnarchiver.unarchiveObjectWithFile(savePath.path!) as? Location else { return }
+        location.basePath = basePath
+        self.location = location
+    }
+    
+    deinit {
+        location?.clearResources = false
     }
 }

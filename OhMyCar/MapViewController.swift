@@ -46,7 +46,7 @@ class MapViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        location = Database.instance.current
+        location = Database.instance.location
         self.prefersStatusBarHidden()
         
         if let location = location {
@@ -101,13 +101,17 @@ class MapViewController: UIViewController{
     @objc
     @IBAction
     private func markLocation(sender: AnyObject) {
+        hideUndo(false)
+        
         guard self.location == nil else {
+            let savedLocation = self.location
             self.location = nil
-            Database.instance.current = nil
+            Database.instance.location = nil
             Database.instance.save()
-            
             showUndo("Location discarded") {
-                self.location = Database.instance.restoreBackup()
+                self.location = savedLocation
+                Database.instance.location = savedLocation
+                Database.instance.save()
                 self.mapView.centerCoordinate = self.location!.coordinate
             }
             
@@ -166,6 +170,7 @@ class MapViewController: UIViewController{
     @objc
     private func hideUndo(animated: Bool = true) {
         NSObject.cancelPreviousPerformRequestsWithTarget(self, selector: #selector(hideUndo), object: nil)
+        undoAction = nil
         
         if animated {
             UIView.animateWithDuration(0.25, animations: {
@@ -259,11 +264,14 @@ extension MapViewController: MKMapViewDelegate {
 //MARK: CaptureViewControllerDelegate
 extension MapViewController: CaptureViewControllerDelegate {
     func captureViewController(controller: CameraViewController, didCaptureImage image: UIImage?) {
+        hideUndo(false)
         location?.image = image
         Database.instance.save()
     }
+
     func captureViewController(controller: CameraViewController, didDiscardImage image: UIImage?) {
         if let oldImage = image {
+            hideUndo(false)
             showUndo("Image discarded") {
                 self.location?.image = oldImage
                 self.captureViewController.image = oldImage
