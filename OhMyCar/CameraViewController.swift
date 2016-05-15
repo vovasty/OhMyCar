@@ -60,10 +60,10 @@ class CameraViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let focusGesture = UITapGestureRecognizer(target: self, action: #selector(CameraViewController.focusAndExposeTap(_:)))
+        let focusGesture = UITapGestureRecognizer(target: self, action: #selector(focusAndExposeTap(_:)))
         view.addGestureRecognizer(focusGesture)
         
-        let zoomGesture = UIPinchGestureRecognizer(target: self, action: #selector(CameraViewController.pinchToZoom(_:)))
+        let zoomGesture = UIPinchGestureRecognizer(target: self, action: #selector(pinchToZoom(_:)))
         view.addGestureRecognizer(zoomGesture)
         
         // Setup the preview view.
@@ -244,18 +244,18 @@ class CameraViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
     private func addObservers() {
         session.addObserver(self, forKeyPath: "running", options: .New, context: &SessionRunningContext)
         stillImageOutput?.addObserver(self, forKeyPath: "capturingStillImage", options: .New, context: &CapturingStillImageContext)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(CameraViewController.subjectAreaDidChange(_:)), name: AVCaptureDeviceSubjectAreaDidChangeNotification, object: videoDeviceInput!.device)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(subjectAreaDidChange(_:)), name: AVCaptureDeviceSubjectAreaDidChangeNotification, object: videoDeviceInput!.device)
 
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(CameraViewController.sessionRuntimeError(_:)), name: AVCaptureSessionRuntimeErrorNotification, object: session)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(sessionRuntimeError(_:)), name: AVCaptureSessionRuntimeErrorNotification, object: session)
 
         // A session can only run when the app is full screen. It will be interrupted in a multi-app layout, introduced in iOS 9,
         // see also the documentation of AVCaptureSessionInterruptionReason. Add observers to handle these session interruptions
         // and show a preview is paused message. See the documentation of AVCaptureSessionWasInterruptedNotification for other
         // interruption reasons.
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(CameraViewController.sessionWasInterrupted(_:)), name: AVCaptureSessionWasInterruptedNotification, object: session)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(sessionWasInterrupted(_:)), name: AVCaptureSessionWasInterruptedNotification, object: session)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(CameraViewController.sessionInterruptionEnded(_:)), name: AVCaptureSessionInterruptionEndedNotification, object: session)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(sessionInterruptionEnded(_:)), name: AVCaptureSessionInterruptionEndedNotification, object: session)
     }
 
     
