@@ -241,7 +241,6 @@ extension MapViewController: MKMapViewDelegate {
         var annotationView: MKPinAnnotationView! = mapView.dequeueReusableAnnotationViewWithIdentifier("Annotation") as? MKPinAnnotationView
         if annotationView == nil {
             annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "Annotation");
-            annotationView!.rightCalloutAccessoryView = UIButton(type: UIButtonType.DetailDisclosure) as UIView
         }
         
         annotationView.animatesDrop = true
