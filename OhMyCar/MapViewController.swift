@@ -35,6 +35,7 @@ class MapViewController: UIViewController{
             markLocationButton.selected = true
             mapView.setCenterCoordinate(location.coordinate, animated: true)
             annotation.coordinate = location.coordinate
+            annotation.subtitle = location.formattedAddress
             mapView.removeAnnotation(annotation)
             mapView.showAnnotations([annotation], animated: true)
             navigateButton.enabled = true
