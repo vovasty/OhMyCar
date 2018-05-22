@@ -8,25 +8,52 @@
 
 import MapKit
 
-class Location: NSObject, NSCoding {
+extension CLLocationCoordinate2D: Codable {
+    enum CodingKeys: String, CodingKey {
+        case lon
+        case lat
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let latitude = try values.decode(Double.self, forKey: .lat)
+        let longitude = try values.decode(Double.self, forKey: .lon)
+        
+        self = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(latitude, forKey: .lat)
+        try container.encode(longitude, forKey: .lon)
+    }
+}
+
+class Location: Codable {
     var coordinate: CLLocationCoordinate2D
     var address: [String: AnyObject]?
-    var date = NSDate()
+    var date = Date()
     var editable = false
-    private var imageName: String?
-    private var basePath: NSURL?
-    private var imagePath: NSURL? {
-        guard let imageName = imageName else { return nil }
-        return basePath?.URLByAppendingPathComponent(imageName)
-    }
-    private var clearResources = true
     
+    private var imageName: String?
+    fileprivate var basePath: URL?
+    private var imagePath: URL? {
+        guard let imageName = imageName else { return nil }
+        return basePath?.appendingPathComponent(imageName)
+    }
+    fileprivate var clearResources = true
+    
+    
+    enum CodingKeys: String, CodingKey {
+        case coordinate, date
+    }
+
     var image: UIImage? {
         set {
             guard let image = newValue else {
                 if let imagePath = imagePath {
                     do {
-                        try NSFileManager.defaultManager().removeItemAtURL(imagePath)
+                        try FileManager.default.removeItem(at: imagePath)
                         print("removed image \(imagePath)")
                     }
                     catch {
@@ -35,67 +62,39 @@ class Location: NSObject, NSCoding {
                 }
                 return
             }
-            
+
             assert(basePath != nil)
-            
+
             if imageName == nil {
-                imageName = NSUUID().UUIDString
+                imageName = NSUUID().uuidString
             }
-            
+
             let imageData = UIImageJPEGRepresentation(image, 0.7)
-            imageData?.writeToURL(imagePath!, atomically: true)
-            
+            try? imageData?.write(to: imagePath!)
+
             print("image saved to \(imagePath!)")
         }
-        
+
         get {
             guard let path = imagePath?.path else { return nil }
             return UIImage(contentsOfFile: path)
         }
     }
-    
-    private init(coordinate: CLLocationCoordinate2D, address: [String: AnyObject]?, basePath: NSURL? = nil) {
+
+    fileprivate init(coordinate: CLLocationCoordinate2D, address: [String: AnyObject]?, basePath: URL? = nil) {
         self.address = address
         self.coordinate = coordinate
         self.basePath = basePath
     }
-    
-    required convenience init?(coder decoder: NSCoder) {
-        let latitude = decoder.decodeDoubleForKey("latitude")
-        let longitude = decoder.decodeDoubleForKey("longitude")
-        let address = decoder.decodeObjectForKey("address") as? [String: AnyObject]
-        let date = decoder.decodeObjectForKey("date") as! NSDate
-        let imageName = decoder.decodeObjectForKey("imageName") as? String
-        
-        self.init(coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), address: address)
-        self.date = date
-        self.imageName = imageName
-    }
-    
-    func encodeWithCoder(coder: NSCoder) {
-        coder.encodeDouble(coordinate.latitude, forKey: "latitude")
-        coder.encodeDouble(coordinate.longitude, forKey: "longitude")
-        
-        if address != nil {
-            coder.encodeObject(address, forKey: "address")
-        }
-        coder.encodeObject(date, forKey: "date")
-        
-        if imageName != nil {
-            coder.encodeObject(imageName, forKey: "imageName")
-        }
-    }
-    
+
     var formattedAddress: String? {
-        guard let addressArray = address?["FormattedAddressLines"] as? [String] else { return nil }
-        
-        return addressArray.joinWithSeparator(" ")
+        return (address?["FormattedAddressLines"] as? [String])?.joined(separator: " ")
     }
-    
+
     deinit {
         guard clearResources, let imagePath = imagePath else { return }
         do {
-            try NSFileManager.defaultManager().removeItemAtURL(imagePath)
+            try FileManager.default.removeItem(at: imagePath)
             print("removed image \(imagePath)")
         }
         catch {
@@ -106,30 +105,29 @@ class Location: NSObject, NSCoding {
 
 class Database {
     var location: Location?
-    let savePath: NSURL
-    let basePath: NSURL
+    let savePath: URL
     
-    static var instance : Database = Database(savePath: NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!.URLByAppendingPathComponent("location.plist"))
+    static var instance : Database = Database(savePath: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("location.plist"))
     
-    init(savePath: NSURL) {
+    init(savePath: URL) {
         self.savePath = savePath
-        self.basePath = savePath.URLByDeletingLastPathComponent!
-
     }
 
     func recordLocation(coordinate: CLLocationCoordinate2D, address: [String: AnyObject]?) -> Location {
-        location = Location(coordinate: coordinate, address: address, basePath: basePath)
+        location = Location(coordinate: coordinate, address: address, basePath: savePath.baseURL)
         
         return location!
     }
     
     func save() {
         if let location = location {
-            NSKeyedArchiver.archiveRootObject(location, toFile: savePath.path!)
+            let encoder = PropertyListEncoder()
+            let data = try! encoder.encode(location)
+            try! data.write(to: savePath)
         }
         else {
             do {
-                try NSFileManager.defaultManager().removeItemAtURL(savePath)
+                try FileManager.default.removeItem(at: savePath)
             }
             catch {
                 print("unable to remove locations \(error)")
@@ -138,8 +136,8 @@ class Database {
     }
     
     func load() {
-        guard let location = NSKeyedUnarchiver.unarchiveObjectWithFile(savePath.path!) as? Location else { return }
-        location.basePath = basePath
+        guard let location = NSKeyedUnarchiver.unarchiveObject(withFile: savePath.path) as? Location else { return }
+        location.basePath = savePath.baseURL!
         self.location = location
     }
     

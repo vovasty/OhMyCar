@@ -28,18 +28,18 @@ class CaptureViewController: CameraViewController {
         didSet {
             switch self.setupResult {
             case .Success:
-                self.errorView.hidden = true
+                self.errorView.isHidden = true
                 break
             case .CameraNotAuthorized:
-                dispatch_async(dispatch_get_main_queue()) {
-                    self.errorView.hidden = false
+                DispatchQueue.main.async {
+                    self.errorView.isHidden = false
                     self.errorLabel.text = "Have no permission to use the camera"
-                    self.openSettingsButton.hidden = false
+                    self.openSettingsButton.isHidden = false
                 }
             case .SessionConfigurationFailed:
-                dispatch_async(dispatch_get_main_queue()) {
-                    self.errorView.hidden = false
-                    self.openSettingsButton?.hidden = true
+                DispatchQueue.main.async {
+                    self.errorView.isHidden = false
+                    self.openSettingsButton?.isHidden = true
                     self.errorLabel.text = "Unable to use the camera"
                 }
                 break
@@ -50,10 +50,10 @@ class CaptureViewController: CameraViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        imageView.opaque = true
+        imageView.isOpaque = true
         imageView.layer.masksToBounds = true
-        imageView.hidden = true
-        captureButton.hidden = true
+        imageView.isHidden = true
+        captureButton.isHidden = true
         self.image = nil
         self.editable = false
         curtainView.alpha = 0
@@ -63,31 +63,31 @@ class CaptureViewController: CameraViewController {
         didSet {
             
             if image == nil {
-                imageView.contentMode = .Center
+                imageView.contentMode = .center
                 imageView.image = UIImage(named: "LoadingScreenupper")
             }
             else {
-                imageView.contentMode = .ScaleAspectFill
+                imageView.contentMode = .scaleAspectFill
                 imageView.image = image
             }
             
-            imageView.hidden = false
-            captureButton.hidden = true
+            imageView.isHidden = false
+            captureButton.isHidden = true
         }
     }
     
     var editable: Bool = true {
         didSet {
-            discardButton.hidden = !editable
+            discardButton.isHidden = !editable
         }
     }
     
     func capture() {
-        imageView.hidden = true
+        imageView.isHidden = true
         
         showCurtain()
         snapStillImage { (image, error) in
-            guard let image = image where error == nil else {
+            guard let image = image, error == nil else {
                 self.image = nil
                 self.editable = false
                 self.hideCurtain()
@@ -95,34 +95,34 @@ class CaptureViewController: CameraViewController {
             }
             
             self.image = image
-            self.imageView.hidden = false
-            self.captureButton.hidden = true
+            self.imageView.isHidden = false
+            self.captureButton.isHidden = true
             
-            self.delegate?.captureViewController(self, didCaptureImage: image)
+            self.delegate?.captureViewController(controller: self, didCaptureImage: image)
             self.hideCurtain()
         }
     }
     
     @IBAction func openSettings(sender: AnyObject) {
-        UIApplication.sharedApplication().openURL(NSURL(string: UIApplicationOpenSettingsURLString)!)
+        UIApplication.shared.openURL(URL(string: UIApplicationOpenSettingsURLString)!)
     }
     
     
     @IBAction func discard(sender: AnyObject) {
-        self.captureButton.hidden = true
-        delegate?.captureViewController(self, didDiscardImage: self.imageView.image)
+        self.captureButton.isHidden = true
+        delegate?.captureViewController(controller: self, didDiscardImage: self.imageView.image)
         
         transition { () in
-            self.captureButton.hidden = self.setupResult != .Success
+            self.captureButton.isHidden = self.setupResult != .Success
             self.imageView.image = nil
-            self.imageView.hidden = true
+            self.imageView.isHidden = true
         }
     }
     
     func clear() {
         transition { () in
-            self.imageView.hidden = true
-            self.captureButton.hidden = true
+            self.imageView.isHidden = true
+            self.captureButton.isHidden = true
             self.imageView.image = nil
         }
     }
@@ -132,10 +132,10 @@ class CaptureViewController: CameraViewController {
     }
     
     private func showCurtain(closure: (()->Void)? = nil) {
-        curtainView.hidden = false
+        curtainView.isHidden = false
         curtainView.alpha = 0
         
-        UIView.animateWithDuration(0.25, animations: {
+        UIView.animate(withDuration: 0.25, animations: {
             self.curtainView.alpha = 1
             }, completion: { (_) in
                 closure?()
@@ -143,14 +143,14 @@ class CaptureViewController: CameraViewController {
     }
     
     private func hideCurtain() {
-        UIView.animateWithDuration(0.25, animations: {
+        UIView.animate(withDuration: 0.25, animations: {
             self.curtainView.alpha = 0
             }, completion: { (_) in
-                self.curtainView.hidden = true
+                self.curtainView.isHidden = true
         })
     }
 
-    private func transition(closure: ()->Void) {
+    private func transition(closure: @escaping ()->Void) {
         showCurtain {
             closure()
             self.hideCurtain()

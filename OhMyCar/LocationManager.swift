@@ -20,19 +20,19 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         locationManager.delegate = self
     }
     
-    class func requestAuthorization(handler: (Bool)->Void) {
+    class func requestAuthorization(handler: @escaping (Bool)->Void) {
         switch CLLocationManager.authorizationStatus() {
-        case .NotDetermined:
+        case .notDetermined:
             LocationManager.instance.authorizationHandlers.append(handler)
             instance.locationManager.requestWhenInUseAuthorization()
-        case .Restricted, .Denied:
+        case .restricted, .denied:
             handler(false)
         default:
             handler(true)
         }
     }
     
-    class func userLocation(handler: (CLLocation?)->Void) {
+    class func userLocation(handler: @escaping (CLLocation?)->Void) {
         requestAuthorization { (allowed) -> Void in
             if allowed {
                 LocationManager.instance.userLocationHandlers.append(handler)
@@ -46,39 +46,37 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     
     //MARK: - CLLocationManagerDelegate
     
-    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-        
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+
         var allowed: Bool
-        
+
         switch status {
-        case .NotDetermined:
+        case .notDetermined:
             //do nothing
             return
-        case .Restricted, .Denied:
+        case .restricted, .denied:
             allowed = false
         default:
             allowed = true
         }
-        
+
         for handler in authorizationHandlers {
             handler(allowed)
         }
-        
+
         authorizationHandlers = []
     }
-    
-    func locationManager(manager: CLLocationManager,
-                         didUpdateLocations locations: [CLLocation]) {
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let currentLocation = locations.first else { return }
         
         manager.stopUpdatingLocation()
-        self.callUserLocationHandlers(currentLocation)
+        self.callUserLocationHandlers(location: currentLocation)
     }
     
-    func locationManager(manager: CLLocationManager,
-                         didFailWithError error: NSError) {
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("failed to update location: \(error)")
-        callUserLocationHandlers(nil)
+        callUserLocationHandlers(location: nil)
         manager.stopUpdatingLocation()
     }
     

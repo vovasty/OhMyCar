@@ -10,19 +10,22 @@ import UIKit
 import AVFoundation
 
 class CameraView: UIView {
-
-    override class func layerClass() -> AnyClass {
-        return AVCaptureVideoPreviewLayer.self
+    override class var layerClass: AnyClass {
+        get {
+            return AVCaptureVideoPreviewLayer.self
+        }
     }
-    
-    var session: AVCaptureSession {
+
+    var session: AVCaptureSession? {
         set {
-            (self.layer as! AVCaptureVideoPreviewLayer).session = newValue
-            (self.layer as! AVCaptureVideoPreviewLayer).videoGravity = AVLayerVideoGravityResizeAspectFill
+            guard let layer = self.layer as? AVCaptureVideoPreviewLayer else { fatalError("no layer") }
+            
+            layer.session = newValue
+            layer.videoGravity = AVLayerVideoGravity.resizeAspectFill
         }
         
         get {
-             return (layer as! AVCaptureVideoPreviewLayer).session
+            return (layer as? AVCaptureVideoPreviewLayer)?.session
         }
     }
 }
