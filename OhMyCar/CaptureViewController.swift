@@ -24,30 +24,6 @@ class CaptureViewController: CameraViewController {
     
     weak var delegate: CaptureViewControllerDelegate?
     
-    override var setupResult: CamSetupResult {
-        didSet {
-            switch self.setupResult {
-            case .Success:
-                self.errorView.isHidden = true
-                break
-            case .CameraNotAuthorized:
-                DispatchQueue.main.async {
-                    self.errorView.isHidden = false
-                    self.errorLabel.text = "Have no permission to use the camera"
-                    self.openSettingsButton.isHidden = false
-                }
-            case .SessionConfigurationFailed:
-                DispatchQueue.main.async {
-                    self.errorView.isHidden = false
-                    self.openSettingsButton?.isHidden = true
-                    self.errorLabel.text = "Unable to use the camera"
-                }
-                break
-            }
-
-        }
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         imageView.isOpaque = true
@@ -84,22 +60,48 @@ class CaptureViewController: CameraViewController {
     
     func capture() {
         imageView.isHidden = true
-        
         showCurtain()
-        snapStillImage { (image, error) in
-            guard let image = image, error == nil else {
+        snap { (result) in
+            do {
+                let image = try result.unwrap()
+                self.image = image
+                self.imageView.isHidden = false
+                self.captureButton.isHidden = true
+                
+                self.delegate?.captureViewController(controller: self, didCaptureImage: image)
+                self.hideCurtain()
+            } catch {
                 self.image = nil
                 self.editable = false
                 self.hideCurtain()
-                return
             }
-            
-            self.image = image
-            self.imageView.isHidden = false
-            self.captureButton.isHidden = true
-            
-            self.delegate?.captureViewController(controller: self, didCaptureImage: image)
-            self.hideCurtain()
+        }
+    }
+    
+    override func cameraControllerDidFinishSetup(_ controller: CameraController) {
+        super.cameraControllerDidFinishSetup(controller)
+        
+        errorView.isHidden = true
+    }
+    
+    override func cameraController(_ controller: CameraController, setupFailedWith error: Error) {
+        super.cameraController(controller, setupFailedWith: error)
+        
+        guard let err = error as? CameraController.CameraControllerError else {
+            self.errorView.isHidden = false
+            self.errorLabel.text = error.localizedDescription
+            return
+        }
+        
+        switch err {
+                case .cameraNotAuthorized:
+                    self.errorView.isHidden = false
+                    self.errorLabel.text = "Have no permission to use the camera"
+                    self.openSettingsButton.isHidden = false
+                default:
+                        self.errorView.isHidden = false
+                        self.openSettingsButton?.isHidden = true
+                        self.errorLabel.text = error.localizedDescription
         }
     }
     
@@ -113,7 +115,7 @@ class CaptureViewController: CameraViewController {
         delegate?.captureViewController(controller: self, didDiscardImage: self.imageView.image)
         
         transition { () in
-            self.captureButton.isHidden = self.setupResult != .Success
+            self.captureButton.isHidden = false
             self.imageView.image = nil
             self.imageView.isHidden = true
         }

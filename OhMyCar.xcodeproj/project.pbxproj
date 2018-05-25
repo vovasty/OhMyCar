@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CD5B3E1F20B899BF008C05F6 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD5B3E1E20B899BF008C05F6 /* CameraController.swift */; };
+		CD5B3E2120B8B747008C05F6 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD5B3E2020B8B747008C05F6 /* Result.swift */; };
 		CDE56B981CE65051006FDFFE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE56B971CE65051006FDFFE /* AppDelegate.swift */; };
 		CDE56B9D1CE65051006FDFFE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CDE56B9B1CE65051006FDFFE /* Main.storyboard */; };
 		CDE56B9F1CE65051006FDFFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CDE56B9E1CE65051006FDFFE /* Assets.xcassets */; };
@@ -21,6 +23,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CD5B3E1E20B899BF008C05F6 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
+		CD5B3E2020B8B747008C05F6 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		CDE56B941CE65051006FDFFE /* OhMyCar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OhMyCar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDE56B971CE65051006FDFFE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CDE56B9C1CE65051006FDFFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -74,10 +78,12 @@
 				CDE56BAE1CE650A5006FDFFE /* CaptureViewController.swift */,
 				CDE56BAF1CE650A5006FDFFE /* CameraViewController.swift */,
 				CDE56BB01CE650A5006FDFFE /* CameraView.swift */,
+				CD5B3E1E20B899BF008C05F6 /* CameraController.swift */,
 				CDE56B9B1CE65051006FDFFE /* Main.storyboard */,
 				CDE56B9E1CE65051006FDFFE /* Assets.xcassets */,
 				CDE56BA01CE65051006FDFFE /* LaunchScreen.storyboard */,
 				CDE56BA31CE65051006FDFFE /* Info.plist */,
+				CD5B3E2020B8B747008C05F6 /* Result.swift */,
 			);
 			path = OhMyCar;
 			sourceTree = "<group>";
@@ -154,12 +160,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD5B3E2120B8B747008C05F6 /* Result.swift in Sources */,
 				CDE56B981CE65051006FDFFE /* AppDelegate.swift in Sources */,
 				CDE56BB61CE650A5006FDFFE /* CaptureViewController.swift in Sources */,
 				CDE56BB11CE650A5006FDFFE /* MapViewController.swift in Sources */,
 				CDE56BB21CE650A5006FDFFE /* LocationManager.swift in Sources */,
 				CDE56BB71CE650A5006FDFFE /* CameraViewController.swift in Sources */,
 				CDE56BB51CE650A5006FDFFE /* Database.swift in Sources */,
+				CD5B3E1F20B899BF008C05F6 /* CameraController.swift in Sources */,
 				CDE56BB81CE650A5006FDFFE /* CameraView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
