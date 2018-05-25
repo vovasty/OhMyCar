@@ -37,7 +37,6 @@ class CaptureViewController: CameraViewController {
     
     var image: UIImage? {
         didSet {
-            
             if image == nil {
                 imageView.contentMode = .center
                 imageView.image = UIImage(named: "LoadingScreenupper")
@@ -54,11 +53,13 @@ class CaptureViewController: CameraViewController {
     
     var editable: Bool = true {
         didSet {
-            discardButton.isHidden = !editable
+            discardButton.isHidden = !(editable && cameraController.setupResult == .success)
         }
     }
     
     func capture() {
+        guard cameraController.setupResult == .success else { return }
+        
         imageView.isHidden = true
         showCurtain()
         snap { (result) in
