@@ -9,12 +9,11 @@
 import UIKit
 import AVFoundation
 
-private var CapturingStillImageContext = "CapturingStillImageContext"
-private var SessionRunningContext = "SessionRunningContext"
-
 protocol CameraControllerDelegate: AnyObject {
     func cameraControllerDidFinishSetup(_ controller: CameraController)
     func cameraController(_ controller: CameraController, setupFailedWith error: Error)
+    func cameraController(_ controller: CameraController, capturingImage: Bool)
+    func cameraController(_ controller: CameraController, sessionRunning: Bool)
 }
 
 class CameraController: NSObject {
@@ -29,7 +28,7 @@ class CameraController: NSObject {
     private let queue = DispatchQueue(label: "session queue", qos: .background)
     private var videoDeviceInput: AVCaptureDeviceInput?
     private var stillImageOutput: AVCaptureStillImageOutput?
-    private var isObserversRegistered = false
+    private var kvoObservers: [NSKeyValueObservation] = []
     var setupResult: SetupResult = .cameraNotAuthorized
     let session = AVCaptureSession()
     weak var delegate: CameraControllerDelegate?
@@ -279,9 +278,21 @@ class CameraController: NSObject {
 //MARK: KVO and Notifications
 extension CameraController {
     private func addObservers() {
-        isObserversRegistered = true
-        session.addObserver(self, forKeyPath: "running", options: .new, context: &SessionRunningContext)
-        stillImageOutput?.addObserver(self, forKeyPath: "capturingStillImage", options: .new, context: &CapturingStillImageContext)
+        kvoObservers = [
+            session.observe(\.running, options: [.new]) { [weak self] (session, value) in
+                guard let sself = self else { return }
+                guard let isSessionRunning  = value.newValue else { return }
+                sself.delegate?.cameraController(sself, sessionRunning: isSessionRunning)
+            },
+            
+            stillImageOutput!.observe(\AVCaptureStillImageOutput.capturingStillImage, options: [.new]) { [weak self] (session, value) in
+                guard let sself = self else { return }
+                guard let isCapturingImage  = value.newValue else { return }
+                sself.delegate?.cameraController(sself, capturingImage: isCapturingImage)
+            },
+        ]
+        
+        
         NotificationCenter.default.addObserver(self, selector: #selector(subjectAreaDidChange(_:)), name: NSNotification.Name.AVCaptureDeviceSubjectAreaDidChange, object: videoDeviceInput!.device)
         
         NotificationCenter.default.addObserver(self, selector: #selector(sessionRuntimeError(_:)), name: NSNotification.Name.AVCaptureSessionRuntimeError, object: session)
@@ -298,11 +309,8 @@ extension CameraController {
     
     
     private func removeObservers(){
-        guard isObserversRegistered else { return }
-        isObserversRegistered = false
+        kvoObservers = []
         NotificationCenter.default.removeObserver(self)
-        session.removeObserver(self, forKeyPath: "running", context: &SessionRunningContext)
-        stillImageOutput?.removeObserver(self, forKeyPath: "capturingStillImage", context: &CapturingStillImageContext)
     }
     
     @objc

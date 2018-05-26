@@ -47,6 +47,19 @@ private extension AVCaptureVideoOrientation {
 }
 
 class CameraViewController: UIViewController, CameraControllerDelegate {
+    func cameraController(_ controller: CameraController, capturingImage: Bool) {
+        guard capturingImage else { return }
+        
+        self.previewView.layer.opacity = 0.0
+        UIView.animate(withDuration: 0.25){
+            self.previewView.layer.opacity = 1.0
+        }
+    }
+    
+    func cameraController(_ controller: CameraController, sessionRunning: Bool) {
+        
+    }
+    
     private let previewView = CameraView(frame: CGRect.zero)
     let cameraController = CameraController()
     
